@@ -267,7 +267,27 @@ const heliportLabels = {
     expression: "$feature.Fac_Name"
   }
 };
-  
+
+// Defining const to make visited airport IATA code labels
+const visitedAirportLabels = {
+  symbol: {
+    type: "text",
+    color: "green",
+    haloColor: "white",
+    haloSize: "1px",
+    font: {
+      size: "16px",
+      family: "Noto Sans",
+      style: "italic",
+      weight: "bold"
+    }
+  },
+  labelPlacement: "below-right",
+  labelExpressionInfo: {
+    expression: "$feature.AirportCode"
+  }
+};
+
 // Create a FeatureLayer to display US Airports 
 const airportsLayer = new FeatureLayer({
    url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Airports_US/FeatureServer",
@@ -312,6 +332,9 @@ const myAirports = new FeatureLayer({
  //adding the popup here
  outFields: ["AirportCode"],
 
+ // placeholder for visited airports IATA code as a label
+  labelingInfo: [visitedAirportLabels]
+  
 });
 
 //adding the custom feature layer to the map
