@@ -314,8 +314,13 @@ const editor = new Editor({
  layerInfos: [pointInfos]
  }); 
 
-// Add the editor widget to the view
-view.ui.add(editor, "top-right");
+const editorExpand = new Expand({
+  view: view,
+  content: editor,
+  expandIcon: "pencil",
+  group: "primary"  // only one widget in this group opens at a time
+});
+view.ui.add(editorExpand, "top-right");
 
 // Add a basemap gallery widget to the view
 const basemapGallery = new BasemapGallery({
