@@ -19,11 +19,12 @@
     "esri/Graphic",
     "esri/layers/GraphicsLayer",
     "esri/layers/FeatureLayer",
+    "esri/widgets/Editor",
     "esri/widgets/BasemapGallery",
     "esri/widgets/Expand",
     "esri/widgets/Locate",
     "esri/widgets/Search"
-  ], function(esriConfig, Map, MapView, Graphic, GraphicsLayer, FeatureLayer, BasemapGallery, Expand, Locate, Search) {
+  ], function(esriConfig, Map, MapView, Graphic, GraphicsLayer, FeatureLayer, Editor, BasemapGallery, Expand, Locate, Search) {
     // Map implementation code 
     esriConfig.apiKey = "AAPTaXW4BVW_ro3UyCh2wpLtbsw..S4T9V5K_hlh_60RGW9t_q7htVqq7iscsvxjm7dd1G8h2i2HUDFCe1l-xBCMaummjmRdIHDLSbsD8DI04VAG9NpUw0YA_nIOccQtabmzOOAcTL6hKl7cTkLMIlXQgwoVMZJbFA3l6_6KFWsMeGQQJCIydC6G0tbHy3E12vEZknZ7DtoweCnBZa-zK4eZnLJPEOQ6f-5q6gQv_sdJZgPHH1FcV0esU1rH-iaopU2P7UXhTG_o68RTsAtcuGj1TIC8dZNJu8W8ieWk.AT1_5tp0GXlO";
   // Create the Map instance
@@ -289,6 +290,32 @@ map.add(airportsLayer);
 
 // Add the Heliports layer to the map
 map.add(heliportsLayer);
+
+//adding the const for the custom feature layer
+const myAirports = new FeatureLayer({
+ url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/My_Visited_Airports/FeatureServer",
+ 
+ //adding the popup here
+ outFields: ["AirportCode"],
+
+});
+
+//adding the custom feature layer to the map
+map.add(myAirports);
+
+// Set the point layer's LayerInfo
+const pointInfos = {
+ layer: myAirports
+}
+
+// Define Editor widget and set its view and layerInfos properties
+const editor = new Editor({
+ view: view,
+ layerInfos: [pointInfos]
+ }); 
+
+// Add the editor widget to the view
+view.ui.add(editor, "top-right");
 
 // Add a basemap gallery widget to the view
 const basemapGallery = new BasemapGallery({
