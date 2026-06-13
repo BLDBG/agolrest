@@ -215,6 +215,19 @@ const heliportRenderer = {
         }
       }
 
+// Define a custom renderer for the Visited Airports layer using a picture marker symbol
+const visitedAirportRenderer = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "https://BLDBG.github.io/agolrest/plane_contrails_24dp.png",
+          "width": "24px",
+          "height": "24px"
+        }
+      }
+
+
+
 // Defining const to make airport labels
 const airportLabels = {
   symbol: {
@@ -294,7 +307,8 @@ map.add(heliportsLayer);
 //adding the const for the custom feature layer
 const myAirports = new FeatureLayer({
  url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/My_Visited_Airports/FeatureServer",
- 
+ renderer: visitedAirportRenderer,
+
  //adding the popup here
  outFields: ["AirportCode"],
 
