@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Hello, AGOL!</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="" />
+
+<!-- ArcGIS API for JavaScript -->
+<link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.25/"></script>
+
+<!-- Initialize the ArcGIS API for JavaScript -->
+<script>
+  require([
+    "esri/config",
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/Graphic",
+    "esri/layers/GraphicsLayer",
+    "esri/layers/FeatureLayer",
+    "esri/widgets/BasemapGallery",
+    "esri/widgets/Expand",
+    "esri/widgets/Locate",
+    "esri/widgets/Search"
+  ], function(esriConfig, Map, MapView, Graphic, GraphicsLayer, FeatureLayer, BasemapGallery, Expand, Locate, Search) {
+    // Map implementation code 
+    esriConfig.apiKey = "AAPTaXW4BVW_ro3UyCh2wpLtbsw..S4T9V5K_hlh_60RGW9t_q7htVqq7iscsvxjm7dd1G8h2i2HUDFCe1l-xBCMaummjmRdIHDLSbsD8DI04VAG9NpUw0YA_nIOccQtabmzOOAcTL6hKl7cTkLMIlXQgwoVMZJbFA3l6_6KFWsMeGQQJCIydC6G0tbHy3E12vEZknZ7DtoweCnBZa-zK4eZnLJPEOQ6f-5q6gQv_sdJZgPHH1FcV0esU1rH-iaopU2P7UXhTG_o68RTsAtcuGj1TIC8dZNJu8W8ieWk.AT1_5tp0GXlO";
+  // Create the Map instance
+const map = new Map({
+  basemap: "arcgis-streets-night" // Map service style
+});
+
+// Create the MapView container rendering our map
+const view = new MapView({
+  map: map,
+  center: [-87.8131, 42.5811], // Longitude, latitude format
+  zoom: 14, // Zoom scale level
+  container: "viewDiv" // ID of our body div
+});
+
+// Create a GraphicsLayer to hold our graphics
+const graphicsLayer = new GraphicsLayer();
+map.add(graphicsLayer);
+
+// Create a point geometry for the location of interest
+const point = {
+  type: "point",
+  longitude: -87.8177658, // Coordinates for Frank's Diner
+  latitude: 42.5834933
+};
+
+// Create a polyline geometry for the Kenosha County Bike Trail
+const polyline = {
+  type: "polyline",
+  paths: [
+    [-87.844498, 42.544199], // Northern point of Kenosha County Bike Trail
+    [-87.844587, 42.535788], // Springbrook Rd crossing point on Kenosha County Bike Trail
+    [-87.844608, 42.522325], // 104th St crossing point on Kenosha County Bike Trail
+    [-87.844854, 42.507636], // 116th St crossing point on Kenosha County Bike Trail
+    [-87.844958, 42.493071] // Kenosha County Bike Trail Bridge
+  ]
+};
+
+// Create a polygon geomtry for the Kenosha Innovation Neighborhood
+const polygon = { 
+  type: "polygon",
+  rings: [
+    [-87.845662, 42.588098], // Northwest corner of Kenosha Innovation Neighborhood
+    [-87.845542, 42.580877], // Southwest corner of Kenosha Innovation Neighborhood
+    [-87.840580, 42.580794], // Southeast corner of Kenosha Innovation Neighborhood
+    [-87.836939, 42.582704], // East corner 1 of Kenosha Innovation Neighborhood
+    [-87.836954, 42.583553], // East corner 2 of Kenosha Innovation Neighborhood
+    [-87.840277, 42.583596], // East corner 3 of Kenosha Innovation Neighborhood
+    [-87.840647, 42.588013], // Northeast corner of Kenosha Innovation Neighborhood
+    [-87.845662, 42.588098] // Northwest corner of Kenosha Innovation Neighborhood
+  ]
+};
+
+//Defining the marker style
+const markerSymbol = {
+  type: "simple-marker",
+  color: "red",
+  style: "diamond",
+  outline: {
+    color: "white",
+    width: 1
+  }
+};
+
+// Defining the line style
+const lineSymbol = {
+  type: "simple-line",
+  color: "blue",
+  width: 2
+};
+
+// Defining the polygon fill style
+const polygonSymbol = {
+  type: "simple-fill",
+  color: "green",
+  outline: {
+    color: "white",
+    width: 1
+  }
+};
+
+// Defining the popup content for the point
+const popupTemplate = {
+  title: "{Name}",
+  content: "{Description}"
+};
+const attributes = {
+  Name: "Frank's Diner",
+  Description: "Lunch-car joint serving up burgers, breakfast & other classic diner fare since 1926."
+};
+
+// Defining the popup content for the polygon - Kenosha Innovation Neighborhood
+const polygonPopupTemplate = {  
+  title: "Kenosha Innovation Neighborhood",
+  content: "The Kenosha Innovation Neighborhood is a vibrant hub of creativity and collaboration, fostering innovation and economic growth in the region. It serves as a catalyst for entrepreneurship, technology development, and community engagement, providing a dynamic environment for startups, established businesses, and educational institutions to thrive together."
+};
+
+// Creating the point
+const pointGraphic = new Graphic({
+  geometry: point,
+  symbol: markerSymbol,
+  // Adding popup properties to the point graphic
+  popupTemplate: popupTemplate,
+  attributes: attributes
+});
+
+// Creating the polyline
+const polylineGraphic = new Graphic({
+  geometry: polyline,
+  symbol: lineSymbol
+});
+
+// Creating the polygon
+const polygonGraphic = new Graphic({
+  geometry: polygon,
+  symbol: polygonSymbol,
+  popupTemplate: polygonPopupTemplate
+});
+
+// Add the point graphic to the graphics layer
+graphicsLayer.add(pointGraphic);
+
+// Add the polyline graphic to the graphics layer
+graphicsLayer.add(polylineGraphic);
+
+// Add the polygon graphic to the graphics layer
+graphicsLayer.add(polygonGraphic);
+
+// Defining the popup content for the Power Plants layer
+const powerPlantsPopupTemplate = {
+  title: "{Plant_Name}",
+  content: [
+    {
+      type: "fields",
+      fieldInfos: [
+        {
+          fieldName: "City",
+          label: "City"
+        },
+        {
+          fieldName: "State",
+          label: "State"
+        },
+        {
+          fieldName: "Install_MW",
+          label: "Installed Capacity (MW)"
+        },
+        {
+          fieldName: "tech_desc",
+          label: "Generation Technology"
+        }
+      ]
+    }
+  ]
+};
+
+
+// Create a FeatureLayer to display Power Plants
+const powerPlantsLayer = new FeatureLayer({
+url: "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Power_Plants_in_the_US/FeatureServer",
+
+// Set the popup template for the Power Plants layer
+  outFields: ["Plant_Name","City","State","Install_MW","tech_desc"],
+  popupTemplate: powerPlantsPopupTemplate
+
+
+});
+
+// Define a custom renderer for the Airports layer using a picture marker symbol
+const airportRenderer = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "https://BLDBG.github.io/agol/local_airport_24dp_8B7DBE.png",
+          "width": "20px",
+          "height": "20px"
+        }
+      }
+
+// Define a custom renderer for the Heliports layer using a picture marker symbol
+const heliportRenderer = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "https://BLDBG.github.io/agol/helicopter-solid.png",
+          "width": "20px",
+          "height": "20px"
+        }
+      }
+
+// Defining const to make airport labels
+const airportLabels = {
+  symbol: {
+    type: "text",
+    color: "#FFFFFF",
+    haloColor: "#5E8D74",
+    haloSize: "2px",
+    font: {
+      size: "12px",
+      family: "Noto Sans",
+      style: "italic",
+      weight: "normal"
+    }
+  },
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+    expression: "$feature.Fac_Name"
+  }
+};
+
+// Defining const to make heliport labels
+const heliportLabels = {
+  symbol: {
+    type: "text",
+    color: "#FFFFFF",
+    haloColor: "#5E8D74",
+    haloSize: "2px",
+    font: {
+      size: "12px",
+      family: "Noto Sans",
+      style: "italic",
+      weight: "normal"
+    }
+  },
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+    expression: "$feature.Fac_Name"
+  }
+};
+  
+// Create a FeatureLayer to display US Airports 
+const airportsLayer = new FeatureLayer({
+   url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Airports_US/FeatureServer",
+   renderer: airportRenderer,
+
+   definitionExpression: "Fac_Type = 'AIRPORT'", //filtering out non-airport facilities
+
+   // Adding labels to the Airports layer
+   labelingInfo: [airportLabels]
+
+});
+
+// Create a FeatureLayer to display US Heliports 
+const heliportsLayer = new FeatureLayer({
+   url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Airports_US/FeatureServer",
+   renderer: heliportRenderer,
+
+   definitionExpression: "Fac_Type = 'HELIPORT'", //filtering out non-heliport facilities
+
+   // Adding labels to the Heliports layer
+   labelingInfo: [heliportLabels]
+
+});
+
+
+
+
+// Add the Power Plants layer to the map
+map.add(powerPlantsLayer);
+
+// Add the Airports layer to the map
+map.add(airportsLayer);
+
+// Add the Heliports layer to the map
+map.add(heliportsLayer);
+
+// Add a basemap gallery widget to the view
+const basemapGallery = new BasemapGallery({
+  view: view
+});
+
+// Create an Expand instance to hold the basemap gallery widget
+const basemapGalleryExpand = new Expand({
+  expandIcon: "layers",  
+  view: view,
+  content: basemapGallery
+});
+// Add basemap gallery widget to the top right corner of the view
+view.ui.add(basemapGalleryExpand, {
+  position: "top-right"
+});
+
+// Create a locate widget to find and display the user's location
+const locateWidget = new Locate({
+  view: view,
+  useGraphicLocation: true // Highlights the user's location
+});
+
+// Add the locate widget to the bottom left corner of the UI
+view.ui.add(locateWidget, {
+  position: "bottom-left"
+});
+
+// Create a Search widget to search for locations and features
+const searchWidget = new Search({
+  view: view
+});
+
+// Adds the search widget below other elements in the bottom right corner
+view.ui.add(searchWidget, {
+  position: "bottom-right",
+});
+
+});
+</script>
+
+<!-- CSS to make the map fullscreen -->
+
+<style>
+  html, 
+  body, 
+  #viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+  }
+</style>
+
+</head>
+<body>
+
+<!-- Create a zoom element for the ArcGIS API for JavaScript map view -->
+
+<div id="viewDiv"></div>
+
+</body>
+</html>
